@@ -18,6 +18,7 @@ using OxyPlot;
 using Microsoft.Win32;
 using System.IO;
 using UDPLogger;
+using System.Xml.Serialization;
 
 namespace MultiPing {
   /// <summary>
@@ -39,7 +40,7 @@ namespace MultiPing {
     // Public property, for the UI to access
     public ResultsCollection PingResults {
       get {
-        return this.pingResults;
+        return pingResults;
       }
     }
 
@@ -112,16 +113,6 @@ namespace MultiPing {
              d = Double.Parse(split[1].Replace('.', ','));
              PingResult temp = pingResults.Add(split[0], d);
              if (temp != null) {
-               if (split[0].Contains("Cell"))
-                 temp.Line.YAxisKey = "V";
-               if (split[0].Contains("mAh"))
-                 temp.Line.YAxisKey = "mAh";
-               if (split[0].Contains("Vtot"))
-                 temp.Line.YAxisKey = "Vtot";
-               if (split[0] == "A")
-                 temp.Line.YAxisKey = "Temp";
-               if (split[0].Contains("Temperature"))
-                 temp.Line.YAxisKey = "Temp";
                Plot1.Series.Add(temp.Line);
                temp.Line.ItemsSource = temp.Points;
              }
@@ -134,9 +125,11 @@ namespace MultiPing {
     }
 
     public void EnableDisableSeries(PingResult p,bool enable) {
-      if (enable)
-        Plot1.Series.Add(p.Line);
-      else
+      if (enable) {
+        if (!Plot1.Series.Contains(p.Line))
+          Plot1.Series.Add(p.Line);
+        p.Line.ItemsSource = p.Points;
+      } else
         Plot1.Series.Remove(p.Line);
       Plot1.InvalidatePlot(true);
     }
@@ -168,8 +161,8 @@ namespace MultiPing {
         SaveFileDialog save = new SaveFileDialog();
         save.Filter = "Log|*.log";
         if ((bool)save.ShowDialog()) {
-          System.IO.FileStream output = new FileStream(save.FileName, FileMode.Create);
-          System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(pingResults.GetType());
+          FileStream output = new FileStream(save.FileName, FileMode.Create);
+          XmlSerializer x = new XmlSerializer(pingResults.GetType());
           x.Serialize(output, pingResults);
           output.Close();
         }
@@ -184,28 +177,30 @@ namespace MultiPing {
     }
 
     private void LoadButton_Click(object sender, RoutedEventArgs e) {
-     // try {
+      try {
         OpenFileDialog load = new OpenFileDialog();
         load.Filter = "Log|*.log";
         if ((bool)load.ShowDialog()) {
-        FileStream input = new FileStream(load.FileName, FileMode.Open);
-        System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(pingResults.GetType());
-        var des= x.Deserialize(input);
-        pingResults = (ResultsCollection)des;
-        input.Close();
 
-        /*StreamReader sr = new StreamReader("c:\\assest.xml");
-        string r = sr.ReadToEnd();
-        List<Asset> list;
-        Type[] extraTypes = new Type[1];
-        extraTypes[0] = typeof(Asset);
-        System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(List<Asset>), extraTypes);
-        object obj = serializer.Deserialize(xReader);
-        list = (List<Asset>)obj;*/
+          Plot1.ResetAllAxes();
+          foreach (var p in pingResults._collection)
+            p.Points.Clear();
+          pingResults._collection.Clear();
+
+          XmlSerializer mySerializer = new XmlSerializer(typeof(ResultsCollection));
+          FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
+          // Call the Deserialize method and cast to the object type.
+          pingResults = (ResultsCollection)mySerializer.Deserialize(myFileStream);
+
+          foreach (var p in pingResults._collection)
+            EnableDisableSeries(p, true);
+
+          Plot1.InvalidatePlot(true);
+
+        }
+      } catch (Exception ex) {
+        MessageBox.Show(ex.ToString());
       }
-     // } catch (Exception ex) {
-     //   MessageBox.Show(ex.ToString());
-     // }
     }
 
     private void Items_Click(object sender, RoutedEventArgs e) {

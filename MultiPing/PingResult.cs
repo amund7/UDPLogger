@@ -9,16 +9,29 @@ using System.Windows;
 
 namespace MultiPing {
 
+  [Serializable]
   public class PingResult : INotifyPropertyChanged {
 
     MainWindow _mainWindow;
 
     public PingResult() {
       _mainWindow = (MainWindow)Application.Current.MainWindow;
+      _active = true;
+      Points = new List<DataPoint>();
+      Line = new LineSeries() { StrokeThickness = 1, LineStyle = LineStyle.Solid };
+      PropertyChanged += (obj, args) => {
+        Console.WriteLine("Property " + args.PropertyName + " changed");
+        if (args.PropertyName == "active")
+          _mainWindow.EnableDisableSeries(this, _active);
+      };
     }
 
-    // Stuff to notify UI when a value has changed
-    public event PropertyChangedEventHandler PropertyChanged;
+    ~PingResult() {
+      Points.Clear();
+    }
+
+  // Stuff to notify UI when a value has changed
+  public event PropertyChangedEventHandler PropertyChanged;
     private void NotifyPropertyChanged(String propertyName = "") {
       if (PropertyChanged != null) {
         PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -30,10 +43,10 @@ namespace MultiPing {
     string _name;
     [XmlElement]
     private double _value;
-    [XmlElement]
+    [XmlIgnore]
     private bool _active;
     [XmlElement]
-    public List<DataPoint> Points { get; private set; }
+    public List<DataPoint> Points { get; set; }
     [XmlIgnore]
     public LineSeries Line;
 
@@ -55,11 +68,22 @@ namespace MultiPing {
       set {
         if (_name != value) {
           _name = value;
+          if (name.Contains("Cell"))
+            Line.YAxisKey = "V";
+          if (name.Contains("mAh"))
+            Line.YAxisKey = "mAh";
+          if (name.Contains("Vtot"))
+            Line.YAxisKey = "Vtot";
+          if (name == "A")
+            Line.YAxisKey = "Temp";
+          if (name.Contains("Temperature"))
+            Line.YAxisKey = "Temp";
           NotifyPropertyChanged("name");
         }
       }
     }
 
+    [XmlIgnore]
     public double value {
       get { return _value; }
       set {
@@ -91,9 +115,10 @@ namespace MultiPing {
            _mainWindow.EnableDisableSeries(this, _active);
       };
     }
+
   }
 
-  [Serializable, XmlRoot("ResultsCollection")]
+  [XmlRoot("ResultsCollection")]
   public class ResultsCollection /*: INotifyCollectionChanged */ {
 
     public ObservableCollection<PingResult> _collection;
@@ -121,3 +146,4 @@ namespace MultiPing {
     }
   }
 }
+
