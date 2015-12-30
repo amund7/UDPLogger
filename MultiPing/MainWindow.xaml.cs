@@ -182,9 +182,11 @@ namespace MultiPing {
         load.Filter = "Log|*.log";
         if ((bool)load.ShowDialog()) {
 
-          Plot1.ResetAllAxes();
-          foreach (var p in pingResults._collection)
+          //Plot1.ResetAllAxes();
+          Plot1.Series.Clear();
+          foreach (var p in pingResults._collection) 
             p.Points.Clear();
+           
           pingResults._collection.Clear();
 
           XmlSerializer mySerializer = new XmlSerializer(typeof(ResultsCollection));

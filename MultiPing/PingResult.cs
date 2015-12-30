@@ -39,7 +39,6 @@ namespace MultiPing {
     }
 
     // Internal storage    private int _ttl;
-    [XmlElement]
     string _name;
     [XmlElement]
     private double _value;
@@ -63,10 +62,12 @@ namespace MultiPing {
       }
     }
 
+    [XmlElement]
     public string name {
       get { return _name; }
       set {
         if (_name != value) {
+          Line.Title =  "\t" + name;
           _name = value;
           if (name.Contains("Cell"))
             Line.YAxisKey = "V";
