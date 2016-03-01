@@ -39,7 +39,7 @@ namespace MultiPing {
     }
 
     // Internal storage    private int _ttl;
-    string _name;
+    private string _name;
     [XmlElement]
     private double _value;
     [XmlIgnore]
@@ -67,7 +67,7 @@ namespace MultiPing {
       get { return _name; }
       set {
         if (_name != value) {
-          Line.Title =  "\t" + name;
+          Line.Title =  "\t" + value;
           _name = value;
           if (name.Contains("Cell"))
             Line.YAxisKey = "V";
@@ -104,12 +104,12 @@ namespace MultiPing {
 
     public PingResult(string Name, double Value, MainWindow mainwindow) {
       _mainWindow = mainwindow;
-      _name = Name;
       _value = Value;
       _active = true;
       Points = new List<DataPoint>();
       Line = new LineSeries() { StrokeThickness = 1, LineStyle = LineStyle.Solid };
-      Line.Title = Value + "\t" + Name;
+      name = Name;
+      //Line.Title = Value + "\t" + Name;
       PropertyChanged += (obj, args) => {
         Console.WriteLine("Property " + args.PropertyName + " changed");
         if (args.PropertyName == "active")
