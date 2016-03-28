@@ -71,9 +71,9 @@ namespace MultiPing {
           _name = value;
           if (name.Contains("Cell"))
             Line.YAxisKey = "V";
-          if (name.Contains("mAh"))
+          if (name.Contains("mAh") || name.Contains("Ah"))
             Line.YAxisKey = "mAh";
-          if (name.Contains("Vtot"))
+          if (name.Contains("Vtot") || name.Contains("Pack"))
             Line.YAxisKey = "Vtot";
           if (name == "A")
             Line.YAxisKey = "Temp";
@@ -109,7 +109,7 @@ namespace MultiPing {
       Points = new List<DataPoint>();
       Line = new LineSeries() { StrokeThickness = 1, LineStyle = LineStyle.Solid };
       name = Name;
-      //Line.Title = Value + "\t" + Name;
+      Line.Title = Value + "\t" + Name;
       PropertyChanged += (obj, args) => {
         Console.WriteLine("Property " + args.PropertyName + " changed");
         if (args.PropertyName == "active")

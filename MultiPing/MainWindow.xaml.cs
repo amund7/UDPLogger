@@ -102,6 +102,8 @@ namespace MultiPing {
       IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 4444);
       byte[] received = Client.EndReceive(res, ref RemoteIpEndPoint);
       string s = Encoding.ASCII.GetString(received);
+      
+      Console.WriteLine(s);
 
       string[] lines = s.Split('\n');
       foreach (var line in lines) {
@@ -135,6 +137,7 @@ namespace MultiPing {
     }
 
     private void PingButton_Click(object sender, RoutedEventArgs e) {
+      try { 
       //PingButton.IsEnabled = !continuous;
       continous = !continous;
       if (continous)
@@ -154,6 +157,10 @@ namespace MultiPing {
       IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
       Client.BeginReceive(new AsyncCallback(CallBack), null);
+      } catch (Exception ex) {
+        MessageBox.Show(ex.ToString());
+      }
+
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e) {
