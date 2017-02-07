@@ -51,6 +51,9 @@ namespace MultiPing {
 
       InitializeComponent();
 
+      System.Threading.Thread.CurrentThread.CurrentCulture =
+        System.Globalization.CultureInfo.InvariantCulture;
+
       //PingList.ItemsSource = pingResults._collection;
 
       Plot1.Axes.Add(new OxyPlot.Wpf.DateTimeAxis());
@@ -65,7 +68,7 @@ namespace MultiPing {
       linearAxis.Position = AxisPosition.Left;
       Plot1.Axes.Add(linearAxis);
 
-      linearAxis = new OxyPlot.Wpf.LinearAxis();
+      /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
       linearAxis.Key = "mAh";
       linearAxis.PositionTier = 2;
@@ -84,7 +87,7 @@ namespace MultiPing {
       linearAxis.Key = "Temp";
       linearAxis.PositionTier = 3;
       linearAxis.Position = AxisPosition.Left;
-      Plot1.Axes.Add(linearAxis);
+      Plot1.Axes.Add(linearAxis);*/
 
       //c_ThresholdReached += pingResults._collection.CollectionChanged;
 
@@ -186,7 +189,7 @@ namespace MultiPing {
     private void LoadButton_Click(object sender, RoutedEventArgs e) {
       try {
         OpenFileDialog load = new OpenFileDialog();
-        load.Filter = "Log|*.log";
+        load.Filter = "Log|*.log|CSV|*.csv";
         if ((bool)load.ShowDialog()) {
 
           //Plot1.ResetAllAxes();
@@ -196,10 +199,39 @@ namespace MultiPing {
            
           pingResults._collection.Clear();
 
-          XmlSerializer mySerializer = new XmlSerializer(typeof(ResultsCollection));
-          FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
-          // Call the Deserialize method and cast to the object type.
-          pingResults = (ResultsCollection)mySerializer.Deserialize(myFileStream);
+          if (load.FilterIndex == 0) {
+
+            XmlSerializer mySerializer = new XmlSerializer(typeof(ResultsCollection));
+            FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
+            // Call the Deserialize method and cast to the object type.
+            pingResults = (ResultsCollection)mySerializer.Deserialize(myFileStream);
+          }
+          else {
+
+            var f = File.OpenRead(load.FileName);
+            var stream = new StreamReader(f);
+            string header = stream.ReadLine();
+            var columns = header.Split(',');
+            int lineNumber = 0;
+            while (!stream.EndOfStream) {
+              var line = stream.ReadLine();
+              int i = 0;
+              foreach (var c in line.Split(',')) {
+                double d = 0;
+                if (Double.TryParse(c, out d)) {
+                  PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
+                  if (temp != null) {
+                    Plot1.Series.Add(temp.Line);
+                    temp.Line.ItemsSource = temp.Points;
+                  }
+                }
+                i++;
+              }
+            }
+
+
+          }
+
 
           foreach (var p in pingResults._collection)
             EnableDisableSeries(p, true);

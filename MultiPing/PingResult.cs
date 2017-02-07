@@ -131,12 +131,15 @@ namespace MultiPing {
       _mainWindow = (MainWindow)Application.Current.MainWindow;
     }
 
-    public PingResult Add(string name, double value) {
+    public PingResult Add(string name, double value, int index=-1) {
       bool found = false;
       foreach (PingResult p in _collection)
         if (p.name == name) {
           found = true;
-          p.value = value;  // p.value*.99+value*.01;
+          if (index > -1)
+            p.Points.Add(new DataPoint(index, value));
+          else
+            p.value = value;  // p.value*.99+value*.01;
         }
       if (!found) {
         PingResult temp = new PingResult(name, value, _mainWindow);
