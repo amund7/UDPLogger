@@ -96,7 +96,7 @@ namespace MultiPing {
         }*/
         if (_value != value) {
           _value = value;
-          Line.Title = value + "\t" + _name;
+          Line.Title = value.ToString("F") + "\t" + _name;
           NotifyPropertyChanged("value");
         }
       }
@@ -109,7 +109,7 @@ namespace MultiPing {
       Points = new List<DataPoint>();
       Line = new LineSeries() { StrokeThickness = 1, LineStyle = LineStyle.Solid };
       name = Name;
-      Line.Title = Value + "\t" + Name;
+      Line.Title = Value.ToString("F") + "\t" + Name;
       PropertyChanged += (obj, args) => {
         Console.WriteLine("Property " + args.PropertyName + " changed");
         if (args.PropertyName == "active")
@@ -136,9 +136,9 @@ namespace MultiPing {
       foreach (PingResult p in _collection)
         if (p.name == name) {
           found = true;
-          if (index > -1)
+          /*if (index > -1)
             p.Points.Add(new DataPoint(index, value));
-          else
+          else*/
             p.value = value;  // p.value*.99+value*.01;
         }
       if (!found) {

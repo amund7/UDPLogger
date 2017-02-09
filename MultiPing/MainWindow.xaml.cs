@@ -19,6 +19,7 @@ using Microsoft.Win32;
 using System.IO;
 using UDPLogger;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace MultiPing {
   /// <summary>
@@ -186,7 +187,7 @@ namespace MultiPing {
       if (!continous) PingButton.IsEnabled = true;
     }
 
-    private void LoadButton_Click(object sender, RoutedEventArgs e) {
+    private async void LoadButton_Click(object sender, RoutedEventArgs e) {
       try {
         OpenFileDialog load = new OpenFileDialog();
         load.Filter = "Log|*.log|CSV|*.csv";
@@ -205,36 +206,40 @@ namespace MultiPing {
             FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
             // Call the Deserialize method and cast to the object type.
             pingResults = (ResultsCollection)mySerializer.Deserialize(myFileStream);
-          }
-          else {
+          } else {
 
             var f = File.OpenRead(load.FileName);
             var stream = new StreamReader(f);
             string header = stream.ReadLine();
             var columns = header.Split(',');
+            int columnCount = columns.Count();
             int lineNumber = 0;
             while (!stream.EndOfStream) {
               var line = stream.ReadLine();
               int i = 0;
-              foreach (var c in line.Split(',')) {
-                double d = 0;
-                if (Double.TryParse(c, out d)) {
-                  PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
-                  if (temp != null) {
-                    Plot1.Series.Add(temp.Line);
-                    temp.Line.ItemsSource = temp.Points;
+              await Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                new Action(() => {
+                foreach (var c in line.Split(',')) {
+                  double d = 0;
+                  if (double.TryParse(c, out d)) {
+                    PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
+                    if (temp != null) {
+                      Plot1.Series.Add(temp.Line);
+                      temp.Line.ItemsSource = temp.Points;
+                    }
                   }
+                  i++;
                 }
-                i++;
-              }
+                //if (lineNumber % columnCount==0)
+                    Plot1.InvalidatePlot(true);
+              }));
             }
-
 
           }
 
 
-          foreach (var p in pingResults._collection)
-            EnableDisableSeries(p, true);
+          /*foreach (var p in pingResults._collection)
+            EnableDisableSeries(p, true);*/
 
           Plot1.InvalidatePlot(true);
 
