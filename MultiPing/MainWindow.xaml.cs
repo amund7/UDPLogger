@@ -187,10 +187,10 @@ namespace MultiPing {
       if (!continous) PingButton.IsEnabled = true;
     }
 
-    private async void LoadButton_Click(object sender, RoutedEventArgs e) {
+    private void LoadButton_Click(object sender, RoutedEventArgs e) {
       try {
         OpenFileDialog load = new OpenFileDialog();
-        load.Filter = "Log|*.log|CSV|*.csv";
+        load.Filter = "CSV|*.csv|Log|*.log";
         if ((bool)load.ShowDialog()) {
 
           //Plot1.ResetAllAxes();
@@ -206,6 +206,7 @@ namespace MultiPing {
             FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
             // Call the Deserialize method and cast to the object type.
             pingResults = (ResultsCollection)mySerializer.Deserialize(myFileStream);
+
           } else {
 
             var f = File.OpenRead(load.FileName);
@@ -217,22 +218,19 @@ namespace MultiPing {
             while (!stream.EndOfStream) {
               var line = stream.ReadLine();
               int i = 0;
-              await Dispatcher.BeginInvoke(DispatcherPriority.Background,
-                new Action(() => {
-                foreach (var c in line.Split(',')) {
-                  double d = 0;
-                  if (double.TryParse(c, out d)) {
-                    PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
-                    if (temp != null) {
-                      Plot1.Series.Add(temp.Line);
-                      temp.Line.ItemsSource = temp.Points;
-                    }
+              foreach (var c in line.Split(',')) {
+                double d = 0;
+                if (double.TryParse(c, out d)) {
+                  PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
+                  if (temp != null) {
+                    Plot1.Series.Add(temp.Line);
+                    temp.Line.ItemsSource = temp.Points;
                   }
-                  i++;
                 }
-                //if (lineNumber % columnCount==0)
-                    Plot1.InvalidatePlot(true);
-              }));
+                i++;
+              }
+              //if (lineNumber % columnCount==0)
+              //Plot1.InvalidatePlot(true);
             }
 
           }
