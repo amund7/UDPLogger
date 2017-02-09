@@ -252,5 +252,10 @@ namespace MultiPing {
       Console.WriteLine("The threshold was reached.");
     }
 
+    private void button_Click(object sender, RoutedEventArgs e) {
+      Plot1.Axes[0].InternalAxis.Reset();
+      Plot1.Axes[1].InternalAxis.Reset();
+      Plot1.InvalidatePlot();
+    }
   }
 }
