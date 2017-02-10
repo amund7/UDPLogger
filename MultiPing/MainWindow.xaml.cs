@@ -62,7 +62,7 @@ namespace MultiPing {
       mainWin = this;
       disp = this.Dispatcher;
 
-      var linearAxis = new OxyPlot.Wpf.LinearAxis();
+      var linearAxis = new OxyPlot.Wpf.TimespanAxis();
       linearAxis.Title = "V";
       linearAxis.Key = "V";
       linearAxis.PositionTier = 1;
@@ -215,17 +215,29 @@ namespace MultiPing {
             var columns = header.Split(',');
             int columnCount = columns.Count();
             int lineNumber = 0;
+            bool hasTime = columns[0].ToUpper().Contains("TIME");
             while (!stream.EndOfStream) {
               var line = stream.ReadLine();
               int i = 0;
+              int t = 0;
               foreach (var c in line.Split(',')) {
                 double d = 0;
                 if (double.TryParse(c, out d)) {
-                  PingResult temp = pingResults.Add(columns[i], d, lineNumber++);
-                  if (temp != null) {
-                    Plot1.Series.Add(temp.Line);
-                    temp.Line.ItemsSource = temp.Points;
-                  }
+
+                  if (hasTime)
+                    if (i == 0)
+                      t = (int)d;
+                    else {
+                      PingResult temp;
+                      if (hasTime)
+                        temp = pingResults.Add(columns[i], d, t);
+                      else
+                        temp = pingResults.Add(columns[i], d, lineNumber++);
+                      if (temp != null) {
+                        Plot1.Series.Add(temp.Line);
+                        temp.Line.ItemsSource = temp.Points;
+                      }
+                    }
                 }
                 i++;
               }
