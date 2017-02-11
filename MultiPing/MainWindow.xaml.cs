@@ -62,7 +62,7 @@ namespace MultiPing {
       mainWin = this;
       disp = this.Dispatcher;
 
-      var linearAxis = new OxyPlot.Wpf.TimespanAxis();
+      var linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "V";
       linearAxis.Key = "V";
       linearAxis.PositionTier = 1;
@@ -200,7 +200,7 @@ namespace MultiPing {
            
           pingResults._collection.Clear();
 
-          if (load.FilterIndex == 0) {
+          if (load.FilterIndex == 2) {
 
             XmlSerializer mySerializer = new XmlSerializer(typeof(ResultsCollection));
             FileStream myFileStream = new FileStream(load.FileName, FileMode.Open);
@@ -223,21 +223,19 @@ namespace MultiPing {
               foreach (var c in line.Split(',')) {
                 double d = 0;
                 if (double.TryParse(c, out d)) {
-
-                  if (hasTime)
-                    if (i == 0)
-                      t = (int)d;
-                    else {
-                      PingResult temp;
-                      if (hasTime)
-                        temp = pingResults.Add(columns[i], d, t);
-                      else
-                        temp = pingResults.Add(columns[i], d, lineNumber++);
-                      if (temp != null) {
-                        Plot1.Series.Add(temp.Line);
-                        temp.Line.ItemsSource = temp.Points;
-                      }
+                  if (hasTime && i == 0)
+                    t = (int)d;
+                  else {
+                    PingResult temp;
+                    if (hasTime)
+                      temp = pingResults.Add(columns[i], d, t);
+                    else
+                      temp = pingResults.Add(columns[i], d, lineNumber++);
+                    if (temp != null) {
+                      Plot1.Series.Add(temp.Line);
+                      temp.Line.ItemsSource = temp.Points;
                     }
+                  }
                 }
                 i++;
               }
