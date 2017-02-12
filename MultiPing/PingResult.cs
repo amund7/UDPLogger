@@ -131,7 +131,7 @@ namespace MultiPing {
       _mainWindow = (MainWindow)Application.Current.MainWindow;
     }
 
-    public PingResult Add(string name, double value, int index=-1) {
+    public PingResult Add(string name, double value, double index=-1) {
       bool found = false;
       foreach (PingResult p in _collection)
         if (p.name == name) {

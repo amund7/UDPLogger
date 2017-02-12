@@ -67,7 +67,10 @@ namespace MultiPing {
       linearAxis.Position = AxisPosition.Bottom;
       Plot1.Axes.Add(linearAxis);
 
-      //Plot1.Axes.Add(new OxyPlot.Wpf.TimeSpanAxis());
+     // Plot1.Series[0].TrackerFormatString = "{2:0.0},{4:0.0}";
+
+
+      Plot1.Axes.Add(new OxyPlot.Wpf.LinearAxis());
 
       /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
@@ -228,7 +231,7 @@ namespace MultiPing {
                   else {
                     PingResult temp;
                     if (hasTime)
-                      temp = pingResults.Add(columns[i], d, t);
+                      temp = pingResults.Add(columns[i], d, t/1000.0);
                     else
                       temp = pingResults.Add(columns[i], d, lineNumber++);
                     if (temp != null) {
@@ -266,8 +269,9 @@ namespace MultiPing {
     }
 
     private void button_Click(object sender, RoutedEventArgs e) {
-      Plot1.Axes[0].InternalAxis.Reset();
-      Plot1.Axes[1].InternalAxis.Reset();
+      foreach (var axe in Plot1.Axes)
+        axe.InternalAxis.Reset();
+
       Plot1.InvalidatePlot();
     }
   }
