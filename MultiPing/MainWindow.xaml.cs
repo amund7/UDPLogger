@@ -57,17 +57,17 @@ namespace MultiPing {
 
       //PingList.ItemsSource = pingResults._collection;
 
-      Plot1.Axes.Add(new OxyPlot.Wpf.DateTimeAxis());
-
       mainWin = this;
       disp = this.Dispatcher;
 
-      var linearAxis = new OxyPlot.Wpf.LinearAxis();
-      linearAxis.Title = "V";
+      var linearAxis = new OxyPlot.Wpf.TimeSpanAxis();
+      //linearAxis.Title = "V";
       linearAxis.Key = "V";
-      linearAxis.PositionTier = 1;
-      linearAxis.Position = AxisPosition.Left;
+      //linearAxis.PositionTier = 1;
+      linearAxis.Position = AxisPosition.Bottom;
       Plot1.Axes.Add(linearAxis);
+
+      //Plot1.Axes.Add(new OxyPlot.Wpf.TimeSpanAxis());
 
       /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
