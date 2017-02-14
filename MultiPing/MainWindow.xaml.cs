@@ -60,17 +60,18 @@ namespace MultiPing {
       mainWin = this;
       disp = this.Dispatcher;
 
-      var linearAxis = new OxyPlot.Wpf.TimeSpanAxis();
+      Plot1.Axes.Add(new OxyPlot.Wpf.TimeSpanAxis());
+      Plot1.Axes[0].Position = AxisPosition.Bottom;
+
+
+      var linearAxis = new OxyPlot.Wpf.LinearAxis();
       //linearAxis.Title = "V";
       linearAxis.Key = "V";
       //linearAxis.PositionTier = 1;
-      linearAxis.Position = AxisPosition.Bottom;
+      linearAxis.Position = AxisPosition.Left;
       Plot1.Axes.Add(linearAxis);
 
      // Plot1.Series[0].TrackerFormatString = "{2:0.0},{4:0.0}";
-
-
-      Plot1.Axes.Add(new OxyPlot.Wpf.LinearAxis());
 
       /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
