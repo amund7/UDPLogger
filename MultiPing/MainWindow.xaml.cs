@@ -254,7 +254,7 @@ namespace MultiPing {
             EnableDisableSeries(p, true);*/
 
           Plot1.InvalidatePlot(true);
-
+          this.Title = Path.GetFileName(load.FileName);
         }
       } catch (Exception ex) {
         MessageBox.Show(ex.ToString());
