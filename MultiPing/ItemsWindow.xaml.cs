@@ -91,5 +91,11 @@ namespace UDPLogger {
       }
       return null;
     }
+
+    private void button_Click(object sender, RoutedEventArgs e) {
+      bool active = !c._collection[0].active;
+      foreach (var item in c._collection)
+        item.active = active;
+    }
   }
 }
