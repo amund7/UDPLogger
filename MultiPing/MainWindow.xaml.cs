@@ -195,6 +195,7 @@ namespace MultiPing {
       try {
         OpenFileDialog load = new OpenFileDialog();
         load.Filter = "CSV|*.csv|Log|*.log";
+        string title = "";
         if ((bool)load.ShowDialog()) {
 
           //Plot1.ResetAllAxes();
@@ -216,30 +217,43 @@ namespace MultiPing {
             var f = File.OpenRead(load.FileName);
             var stream = new StreamReader(f);
             string header = stream.ReadLine();
+            while (header.TrimStart().StartsWith("//")) {
+              title += header;
+              header = stream.ReadLine(); // VESC MOnitor first line is a summary/comment
+            }
             var columns = header.Split(',');
             int columnCount = columns.Count();
             int lineNumber = 0;
-            bool hasTime = columns[0].ToUpper().Contains("TIME");
+            int hasTime = -1;
+            if (columns[0].ToUpper().Contains("TIME"))
+              hasTime = 0;
+            if (columns.Contains("TimePassedInMs"))
+              hasTime = Array.IndexOf(columns, "TimePassedInMs");
             while (!stream.EndOfStream) {
               var line = stream.ReadLine();
               int i = 0;
               int t = 0;
               foreach (var c in line.Split(',')) {
                 double d = 0;
-                if (double.TryParse(c, out d)) {
-                  if (hasTime && i == 0)
-                    t = (int)d;
-                  else {
-                    PingResult temp;
-                    if (hasTime)
-                      temp = pingResults.Add(columns[i], d, t/1000.0);
-                    else
-                      temp = pingResults.Add(columns[i], d, lineNumber++);
-                    if (temp != null) {
-                      Plot1.Series.Add(temp.Line);
-                      temp.Line.ItemsSource = temp.Points;
-                    }
+                if (i == hasTime) {
+                  i++;
+                  continue; // don't graph the timestamp
+                }
+                if (i == 0 && hasTime != -1) {
+                  double.TryParse(line.Split(',')[hasTime], out d);
+                  t = (int)d;
+                } else
+                  if (double.TryParse(c, out d)) {
+                  PingResult temp;
+                  if (hasTime != -1)
+                    temp = pingResults.Add(columns[i], d, t / 1000.0);
+                  else
+                    temp = pingResults.Add(columns[i], d, lineNumber++);
+                  if (temp != null) {
+                    Plot1.Series.Add(temp.Line);
+                    temp.Line.ItemsSource = temp.Points;
                   }
+
                 }
                 i++;
               }
@@ -254,7 +268,7 @@ namespace MultiPing {
             EnableDisableSeries(p, true);*/
 
           Plot1.InvalidatePlot(true);
-          this.Title = Path.GetFileName(load.FileName);
+          this.Title = Path.GetFileName(load.FileName) + title;
         }
       } catch (Exception ex) {
         MessageBox.Show(ex.ToString());
