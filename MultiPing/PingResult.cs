@@ -71,7 +71,7 @@ namespace MultiPing {
           _name = value;
           if (name.Contains("Cell"))
             Line.YAxisKey = "V";
-          if (name.Contains("mAh") || name.Contains("Ah"))
+          if (name.Contains("mAh") /*|| name.Contains("Ah")*/)
             Line.YAxisKey = "mAh";
           if (name.Contains("Vtot") || name.Contains("Pack"))
             Line.YAxisKey = "Vtot";
@@ -79,6 +79,8 @@ namespace MultiPing {
             Line.YAxisKey = "Temp";
           if (name.Contains("Temperature"))
             Line.YAxisKey = "Temp";
+          if (name == "RPM")
+            Line.YAxisKey = "RPM";
           NotifyPropertyChanged("name");
         }
       }

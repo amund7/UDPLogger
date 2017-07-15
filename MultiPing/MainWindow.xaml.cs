@@ -71,7 +71,14 @@ namespace MultiPing {
       linearAxis.Position = AxisPosition.Left;
       Plot1.Axes.Add(linearAxis);
 
-     // Plot1.Series[0].TrackerFormatString = "{2:0.0},{4:0.0}";
+      // Plot1.Series[0].TrackerFormatString = "{2:0.0},{4:0.0}";
+
+      linearAxis = new OxyPlot.Wpf.LinearAxis();
+      linearAxis.Title = "RPM";
+      linearAxis.Key = "RPM";
+      linearAxis.PositionTier = 2;
+      linearAxis.Position = AxisPosition.Right;
+      Plot1.Axes.Add(linearAxis);
 
       /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
@@ -235,10 +242,10 @@ namespace MultiPing {
               int t = 0;
               foreach (var c in line.Split(',')) {
                 double d = 0;
-                if (i == hasTime) {
+                /*if (i == hasTime) {
                   i++;
                   continue; // don't graph the timestamp
-                }
+                }*/
                 if (i == 0 && hasTime != -1) {
                   double.TryParse(line.Split(',')[hasTime], out d);
                   t = (int)d;

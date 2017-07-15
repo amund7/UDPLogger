@@ -4,7 +4,7 @@
                 xmlns:oxy="http://oxyplot.org/wpf"
         Title="MultiPing" Height="749.2" Width="849" >
     <Grid>
-        <oxy:Plot x:Name="Plot1" Title="{Binding Title}" FontSize="21.333" FontWeight="Bold" LegendPosition="LeftTop" LegendFontSize="20" LegendFontWeight="Bold">
+        <oxy:Plot x:Name="Plot1" Title="{Binding Title}" FontSize="21.333" FontWeight="Bold" LegendPosition="LeftTop" LegendFontSize="20" LegendFontWeight="Bold" Margin="0,20,0,0">
             <oxy:Plot.Series>
                 <oxy:LineSeries ItemsSource="{Binding Points}"/>
             </oxy:Plot.Series>
