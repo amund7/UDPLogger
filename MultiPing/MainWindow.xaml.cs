@@ -73,12 +73,12 @@ namespace MultiPing {
 
       // Plot1.Series[0].TrackerFormatString = "{2:0.0},{4:0.0}";
 
-      linearAxis = new OxyPlot.Wpf.LinearAxis();
+      /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "RPM";
       linearAxis.Key = "RPM";
       linearAxis.PositionTier = 2;
       linearAxis.Position = AxisPosition.Right;
-      Plot1.Axes.Add(linearAxis);
+      Plot1.Axes.Add(linearAxis);*/
 
       /*linearAxis = new OxyPlot.Wpf.LinearAxis();
       linearAxis.Title = "mAh";
@@ -240,17 +240,22 @@ namespace MultiPing {
               var line = stream.ReadLine();
               int i = 0;
               int t = 0;
+
+              if (hasTime != -1) {
+                double d;
+                double.TryParse(line.Split(',')[hasTime], out d);
+                t = (int)d;
+              }
+
               foreach (var c in line.Split(',')) {
                 double d = 0;
-                /*if (i == hasTime) {
+
+                if (i == hasTime) {
                   i++;
                   continue; // don't graph the timestamp
-                }*/
-                if (i == 0 && hasTime != -1) {
-                  double.TryParse(line.Split(',')[hasTime], out d);
-                  t = (int)d;
-                } else
-                  if (double.TryParse(c, out d)) {
+                }
+
+                if (double.TryParse(c, out d)) {
                   PingResult temp;
                   if (hasTime != -1)
                     temp = pingResults.Add(columns[i], d, t / 1000.0);
