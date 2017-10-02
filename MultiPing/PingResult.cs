@@ -20,7 +20,7 @@ namespace MultiPing {
       Points = new List<DataPoint>();
       Line = new LineSeries() { StrokeThickness = 1, LineStyle = LineStyle.Solid };
       PropertyChanged += (obj, args) => {
-        Console.WriteLine("Property " + args.PropertyName + " changed");
+        //Console.WriteLine("Property " + args.PropertyName + " changed");
         if (args.PropertyName == "active")
           _mainWindow.EnableDisableSeries(this, _active);
       };
@@ -104,6 +104,14 @@ namespace MultiPing {
       }
     }
 
+    public void SetLegendValue(double d) {
+      if (_value != d) {
+        _value = d;
+        Line.Title = value.ToString("F") + "\t" + _name;
+        NotifyPropertyChanged("value");
+      }
+    }
+
     public PingResult(string Name, double Value, MainWindow mainwindow) {
       _mainWindow = mainwindow;
       _value = Value;
@@ -113,7 +121,7 @@ namespace MultiPing {
       name = Name;
       Line.Title = Name;
       PropertyChanged += (obj, args) => {
-        Console.WriteLine("Property " + args.PropertyName + " changed");
+        //Console.WriteLine("Property " + args.PropertyName + " changed");
         if (args.PropertyName == "active")
            _mainWindow.EnableDisableSeries(this, _active);
       };

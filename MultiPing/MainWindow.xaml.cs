@@ -120,21 +120,23 @@ namespace MultiPing {
       
       Console.WriteLine(s);
 
-      string[] lines = s.Split('\n');
-      foreach (var line in lines) {
-        string[] split = line.Split(':');
-        if (split.Length > 1)
-          MainWindow.disp.BeginInvoke(DispatcherPriority.Normal,
-           new Action(() => {
-             double d = 0;
-             d = Double.Parse(split[1].Replace('.', ','));
-             PingResult temp = pingResults.Add(split[0], d);
-             if (temp != null) {
-               Plot1.Series.Add(temp.Line);
-               temp.Line.ItemsSource = temp.Points;
-             }
-             Plot1.InvalidatePlot(true);
-           }));
+      if (!s.Contains("garbage")) {
+        string[] lines = s.Split('\n');
+        foreach (var line in lines) {
+          string[] split = line.Split(':');
+          if (split.Length > 1)
+            MainWindow.disp.BeginInvoke(DispatcherPriority.Normal,
+             new Action(() => {
+               double d = 0;
+               d = Double.Parse(split[1]/*.Replace('.', ',')*/);
+               PingResult temp = pingResults.Add(split[0], d);
+               if (temp != null) {
+                 Plot1.Series.Add(temp.Line);
+                 temp.Line.ItemsSource = temp.Points;
+               }
+               Plot1.InvalidatePlot(true);
+             }));
+        }
       }
 
       if (continous)
@@ -301,5 +303,35 @@ namespace MultiPing {
 
       Plot1.InvalidatePlot();
     }
+
+    private void Plot1_MouseDown_1(object sender, System.Windows.Input.MouseEventArgs e) {
+      {
+        //Console.Write(e.LeftButton);
+        ///if (e.LeftButton != System.Windows.Input.MouseButtonState.Pressed)
+          return;
+        var axisList = Plot1.Axes;
+        OxyPlot.Wpf.Axis X_Axis = null;
+        OxyPlot.Wpf.Axis Y_Axis = null;
+        foreach (var ax in axisList) {
+          if (ax.Position == AxisPosition.Bottom)
+            X_Axis = ax;
+          else if (ax.Position == AxisPosition.Left)
+            Y_Axis = ax;
+        }
+        var point = e.GetPosition(this);
+        Console.WriteLine(point.X + " " + point.Y + " min " + X_Axis.Minimum+ " max " + X_Axis.Maximum);
+
+        double timestamp = point.X;
+
+        if (pingResults._collection.Count > 0)
+          foreach (var p in pingResults._collection)
+            p.SetLegendValue(p.Points
+                              .Where(x => x.X >= timestamp*1000)
+                              .FirstOrDefault()
+                              .Y);
+        //DataPoint p = .InverseTransform(point.X);
+      }
+    }
+
   }
 }
